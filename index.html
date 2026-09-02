@@ -1,42 +1,68 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Accesorios Matias - Formosa</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Catalogo Facil - Vende sin GitHub</title>
 <style>
-body{font-family:Arial;margin:0;background:#f5f5f5}
+body{font-family:system-ui;margin:0;background:#f6f6f6}
 header{background:#111;color:#fff;padding:20px;text-align:center}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px;max-width:600px;margin:auto}
-.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px;max-width:700px;margin:auto}
+.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px #0001}
 .card img{width:100%;height:150px;object-fit:cover}
-.card-body{padding:10px}
-.price{color:#25D366;font-weight:bold}
-.btn{display:block;background:#25D366;color:#fff;text-align:center;padding:10px;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:8px}
+.b{padding:10px}
+.btn{background:#25D366;color:#fff;display:block;text-align:center;padding:10px;border-radius:8px;text-decoration:none;font-weight:bold}
+.panel{max-width:700px;margin:12px auto;background:#fff;padding:15px;border-radius:12px}
+input{width:100%;padding:11px;margin:6px 0;border:1px solid #ccc;border-radius:8px;box-sizing:border-box}
 </style>
 </head>
 <body>
 <header>
-<h1>📱 Accesorios Matias</h1>
-<p>Formosa - WhatsApp: 3704-632023</p>
+<h1 id="t">Mi Tienda</h1>
+<p><a id="waLink" style="color:#25D366" href="#">WhatsApp</a> | <span id="count">0 productos</span></p>
 </header>
-<div class="grid">
-<div class="card">
-<img src="https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400">
-<div class="card-body">
-<h3>Auriculares Bluetooth</h3>
-<p class="price">$8.500</p>
-<a class="btn" href="https://wa.me/543704632023?text=Hola%20Matias!%20Quiero%20los%20Auriculares%20de%20$8500" target="_blank">Pedir por WhatsApp</a>
+
+<div id="grid" class="grid"></div>
+
+<div class="panel">
+<h3>⚙️ Panel del Dueño (Solo vos lo ves)</h3>
+<input id="shop" placeholder="Nombre de tu negocio">
+<input id="wa" placeholder="Tu WhatsApp: 3704... (sin +54)">
+<button onclick="saveShop()" style="width:100%;padding:12px;background:#111;color:#fff;border-radius:8px;border:0">Guardar datos</button>
+<hr>
+<input id="n" placeholder="Producto: ej iPhone 11">
+<input id="p" placeholder="Precio: ej $200.000">
+<input id="img" placeholder="Pega link de foto (de galeria o Google)">
+<button onclick="add()" style="width:100%;padding:12px;background:#111;color:#fff;border-radius:8px;border:0;margin-top:6px">+ Agregar producto</button>
+<button onclick="clearAll()" style="margin-top:10px;background:none;border:0;color:#888;font-size:12px">Borrar todo</button>
+<div id="share" style="margin-top:15px;background:#e8f9ee;padding:12px;border-radius:8px;display:none"></div>
 </div>
-</div>
-<div class="card">
-<img src="https://images.unsplash.com/photo-1605236453806-6ff36851218e?w=400">
-<div class="card-body">
-<h3>Cargador Rápido</h3>
-<p class="price">$4.200</p>
-<a class="btn" href="https://wa.me/543704632023?text=Hola%20Matias!%20Quiero%20el%20Cargador%20de%20$4200" target="_blank">Pedir por WhatsApp</a>
-</div>
-</div>
-</div>
+
+<script>
+let prods=JSON.parse(localStorage.getItem('prods')||'[]');
+let shop=localStorage.getItem('shop')||'Mi Tienda';
+let waNum=localStorage.getItem('wa')||'3704632023';
+function render(){
+ document.getElementById('t').innerText=shop;
+ document.getElementById('count').innerText=prods.length+' productos';
+ document.getElementById('shop').value=shop;
+ document.getElementById('wa').value=waNum;
+ document.getElementById('waLink').href='https://wa.me/54'+waNum;
+ let g=document.getElementById('grid'); g.innerHTML='';
+ if(prods.length==0) g.innerHTML='<p style="grid-column:1/-1;text-align:center;color:#888">Aún no cargaste productos. Usá el panel de abajo.</p>';
+ prods.forEach((pr,i)=>{
+  let m=encodeURIComponent('Hola! Quiero '+pr.n+' de '+pr.p);
+  g.innerHTML+=`<div class=card><img src=${pr.img}><div class=b><b>${pr.n}</b><div style=color:#00a650;font-weight:bold>${pr.p}</div><a class=btn href=https://wa.me/54${waNum}?text=${m} target=_blank>Pedir</a><button onclick="del(${i})" style="border:0;background:none;color:#999;font-size:11px;margin-top:6px">eliminar</button></div></div>`;
+ });
+ if(prods.length>0){
+  document.getElementById('share').style.display='block';
+  document.getElementById('share').innerHTML='✅ Ya podés vender!<br>Pasale este link a tus clientes:<br><b>'+location.href+'</b><br><br><small>Este link es TU tienda. Los clientes solo ven productos y te escriben.</small>';
+ }
+}
+function saveShop(){shop=document.getElementById('shop').value;waNum=document.getElementById('wa').value;localStorage.setItem('shop',shop);localStorage.setItem('wa',waNum);render();}
+function add(){let n=document.getElementById('n').value,p=document.getElementById('p').value,img=document.getElementById('img').value||'https://via.placeholder.com/400';if(!n||!p)return alert('Falta nombre y precio');prods.push({n,p,img});localStorage.setItem('prods',JSON.stringify(prods));document.getElementById('n').value='';document.getElementById('p').value='';document.getElementById('img').value='';render();}
+function del(i){prods.splice(i,1);localStorage.setItem('prods',JSON.stringify(prods));render();}
+function clearAll(){if(confirm('Borrar todo?')){prods=[];localStorage.removeItem('prods');render();}}
+render();
+</script>
 </body>
 </html>
